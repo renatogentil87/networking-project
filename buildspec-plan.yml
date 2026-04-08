@@ -1,0 +1,19 @@
+version: 0.2
+phases:
+  install:
+    commands:
+      - "wget https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+      - "unzip terraform_${TF_VERSION}_linux_amd64.zip"
+      - "mv terraform /usr/local/bin/"
+  pre_build:
+    commands:
+      - "terraform init -backend-config=backend.tfvars"
+  build:
+    commands:
+      - "terraform plan -out=tfplan"
+      - "terraform show -no-color tfplan > plan_output.txt"
+artifacts:
+  files:
+    - tfplan
+    - plan_output.txt
+    - '**/*'
