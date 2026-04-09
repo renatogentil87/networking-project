@@ -184,7 +184,6 @@ resource "aws_ec2_transit_gateway_route" "internet-via-firewall" {
 }
 
 
-
 ####### Peering Configuration 
 
 # Requestor (uses default provider - ca-central-1)
@@ -219,6 +218,11 @@ resource "aws_ec2_transit_gateway_route_table_association" "vpn" {
 resource "aws_ec2_transit_gateway_route_table_propagation" "vpn_propagation" {
   transit_gateway_attachment_id  = aws_vpn_connection.vpn-to-canada.transit_gateway_attachment_id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rt-full-mesh.id
+}
+
+resource "aws_ec2_transit_gateway_route_table_propagation" "vpn_propagation_to_shared-rt" {
+  transit_gateway_attachment_id  = aws_vpn_connection.vpn-to-canada.transit_gateway_attachment_id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rt-shared.id
 
 }
 
