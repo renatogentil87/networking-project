@@ -6,7 +6,8 @@ locals {
 }
 
 resource "aws_vpc" "shared_vpc" {
-  cidr_block = "172.22.0.0/16"
+  cidr_block           = "172.22.0.0/16"
+  enable_dns_hostnames = true
   tags = merge(local.shared-vpc-tags, {
     Name = "shared-vpc"
   })
