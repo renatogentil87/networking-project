@@ -56,19 +56,18 @@ resource "aws_route_table" "private_route" {
   })
 }
 
-# Default route to NAT Gateway — now as a separate resource
+# Default route to NAT Gateway 
 resource "aws_route" "default-to-nat" {
   route_table_id         = aws_route_table.private_route.id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.nat.id
+  transit_gateway_id = aws_ec2_transit_gateway.main.id
 }
 resource "aws_route_table_association" "private_subnet_assoc" {
   subnet_id      = aws_subnet.private_subnet.id
   route_table_id = aws_route_table.private_route.id
 }
 
-variable "spoke_cidrs" {
-
+variable "spoke_vpc_cidrs" {
   description = "List of destination CIDRs to route through TGW"
   type        = list(string)
   default = [
@@ -81,7 +80,7 @@ variable "spoke_cidrs" {
 
 resource "aws_route" "shared-vpc-to-all" {
   route_table_id         = aws_route_table.private_route.id
-  for_each               = toset(var.spoke_cidrs)
+  for_each               = toset(var.spoke_vpc_cidrs)
   destination_cidr_block = each.value
   transit_gateway_id     = aws_ec2_transit_gateway.main.id
 }

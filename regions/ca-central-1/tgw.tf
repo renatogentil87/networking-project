@@ -232,3 +232,9 @@ resource "aws_ec2_transit_gateway_route" "firewall-rt-default" {
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.firewall_vpc_attachment.id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.firewall-rt.id
 }
+
+resource "aws_ec2_transit_gateway_route" "shared-vpc-rt-to-internet-via-firewall" {
+  destination_cidr_block         = "0.0.0.0/0"
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.firewall_vpc_attachment.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rt-shared.id
+}

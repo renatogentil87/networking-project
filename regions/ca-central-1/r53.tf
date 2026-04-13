@@ -1,3 +1,9 @@
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+locals {
+  aws_account_id = data.aws_caller_identity.current.account_id
+  region         = data.aws_region.current.name
+}
 
 locals {
   r53-tags = {
@@ -201,10 +207,10 @@ resource "aws_route53_resolver_rule_association" "blocked_domain_association" {
 }
 
 resource "aws_route53_resolver_firewall_domain_list" "block_example_domain_list" {
-  name    = "block domain"
-  domains = ["block.example.com"]
-    tags = merge(local.r53-tags, {
-    Name = "block-example-com-rule"
+  name    = "blocked domain"
+  domains = ["*.blocked.example.com."]
+  tags = merge(local.r53-tags, {
+    Name = "blocked-example-com-rule"
   })
 }
 
@@ -219,7 +225,7 @@ resource "aws_route53_resolver_firewall_rule" "block_example_com_rule" {
   name                    = "block-example-com-rule"
   action                  = "BLOCK"
   block_override_dns_type = "CNAME"
-  block_override_domain   = "example.com"
+  block_override_domain   = "rrdog.blocked.com"
   block_override_ttl      = 1
   block_response          = "OVERRIDE"
   firewall_domain_list_id = aws_route53_resolver_firewall_domain_list.block_example_domain_list.id
@@ -228,12 +234,70 @@ resource "aws_route53_resolver_firewall_rule" "block_example_com_rule" {
 }
 
 
-resource "aws_route53_resolver_firewall_rule_group_association" "shared_vpc_association" {
-  name                   = "shared_vpc_fw_association"
-  firewall_rule_group_id = aws_route53_resolver_firewall_rule_group.fw_rule_group.id
+resource "aws_route53_resolver_firewall_rule_group_association" "block_domain_vpc_association" {
+  for_each = toset([
+    "vpc-003944ca32330a44c",
+    "vpc-0219ac334c48b2c4e",
+    "vpc-066f19abe5b3c9887",
+    "vpc-0f46ad151dde4f42b"
+  ])
+
+  name                   = "block-example-domain-${each.key}"
+  firewall_rule_group_id = aws_route53_resolver_firewall_rule.block_example_com_rule.firewall_rule_group_id
+  vpc_id                 = each.key
   priority               = 200
-  vpc_id                 = aws_vpc.shared_vpc.id
+
+  tags = {
+    Name      = "block-example-domain-${each.key}"
+    Managedby = "Terraform"
+    Project   = "Networking Project"
+  }
+}
+
+### Query Logging configuration
+provider "aws" {
+  alias  = "us-east-1"
+  region = "us-east-1"
+}
+resource "aws_route53_resolver_query_log_config" "query_logging" {
+  provider = aws.us-east-1 
+  name = "query-logging-to-cloudwatch"
+
+  destination_arn = aws_cloudwatch_log_group.r53_resolver_query_logs.arn
+  depends_on      = [aws_cloudwatch_log_resource_policy.route53_query_logging_policy]
+
   tags = merge(local.r53-tags, {
-    Name = "shared-vpc-fw-association"
-  } )
+    Name = "r53-query-logging"
+  })
+}
+
+resource "aws_cloudwatch_log_group" "r53_resolver_query_logs" {
+  name              = "/aws/route53/resolver/querylogs"
+  retention_in_days = 7
+
+  tags = merge(local.r53-tags, {
+    Name = "r53-resolver-query-logs"
+  })
+}
+
+resource "aws_cloudwatch_log_resource_policy" "route53_query_logging_policy" {
+  provider    = aws.us-east-1 
+  policy_name = "route53-query-logging-policy"
+
+  policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "route53.amazonaws.com"
+        }
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:${local.region}:${local.aws_account_id}:log-group:/aws/route53/*"
+      }
+    ]
+  })
 }

@@ -74,6 +74,7 @@ resource "aws_route_table" "firewall-private-route-table" {
   })
 }
 
+
 resource "aws_route" "return-traffic-to-vpc-a" {
   route_table_id         = aws_route_table.firewall-public-route-table.id
   vpc_endpoint_id        = "vpce-0beb16e3ff4353b12"
@@ -84,6 +85,13 @@ resource "aws_route" "return-traffic-to-vpc-b" {
   route_table_id         = aws_route_table.firewall-public-route-table.id
   vpc_endpoint_id        = "vpce-0beb16e3ff4353b12"
   destination_cidr_block = "172.18.0.0/16"
+}
+
+
+resource "aws_route" "return-traffic-to-shared-vpc" {
+  route_table_id         = aws_route_table.firewall-public-route-table.id
+  vpc_endpoint_id        = "vpce-0beb16e3ff4353b12"
+  destination_cidr_block = "172.22.0.0/16"
 }
 
 resource "aws_route" "firewall-to-natgw" {
@@ -106,6 +114,11 @@ resource "aws_route" "firewall-to-vpc-a" {
   route_table_id         = aws_route_table.firewall-private-route-table.id
   transit_gateway_id     = aws_ec2_transit_gateway.main.id
   destination_cidr_block = "172.16.0.0/16"
+}
+resource "aws_route" "firewall-to-shared-vpc" {
+  route_table_id         = aws_route_table.firewall-private-route-table.id
+  transit_gateway_id     = aws_ec2_transit_gateway.main.id
+  destination_cidr_block = "172.22.0.0/16"
 }
 
 # ===== SUBNET 3: Public Subnet (NAT Gateway) =====
