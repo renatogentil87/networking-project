@@ -34,3 +34,5 @@ phases:
   post_build:
     commands:
       - echo "Both regions applied successfully"
+
+      

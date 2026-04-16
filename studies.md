@@ -1,3 +1,5 @@
+
+
 Phase 0: BGP Fundamentals Refresh (Week 1)
 
 Goal: Rebuild your BGP muscle memory — from basics to advanced path selection
