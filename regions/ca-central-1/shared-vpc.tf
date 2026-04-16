@@ -91,3 +91,23 @@ resource "aws_route" "shared-vpc-to-shared-vpc" {
   transit_gateway_id     = aws_ec2_transit_gateway.main.id
 }
 
+data "aws_iam_role" "admin" {
+  name = "Admin"
+}
+
+resource "aws_cloudwatch_log_group" "shared_vpc_flow_logs" {
+  name = "SharedVPCFlowLogs"
+  tags = merge(local.shared-vpc-tags, {
+    Name = "shared-vpc-flow-logs"
+  })
+}
+resource "aws_flow_log" "shared_vpc_flow_log" {
+  log_destination      = aws_cloudwatch_log_group.shared_vpc_flow_logs.arn
+  log_destination_type = "cloud-watch-logs"
+  iam_role_arn         = data.aws_iam_role.admin.arn
+  traffic_type         = "ALL"
+  vpc_id               = aws_vpc.shared_vpc.id
+  tags = merge(local.shared-vpc-tags, {
+    Name = "shared-vpc-flow-log"
+  })
+}
