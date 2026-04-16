@@ -132,7 +132,6 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "shared-vpc-into-full
 }
 
 
-
 resource "aws_ec2_transit_gateway_route_table_propagation" "shared-into-isolated" {
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.shared-vpc-attachment.id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rt-isolated.id
@@ -169,6 +168,19 @@ resource "aws_ec2_transit_gateway_route" "vpc-a-canada-to-vpc-b-london" {
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.peering-to-london-region.id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rt-full-mesh.id
 }
+
+resource "aws_ec2_transit_gateway_route" "shared-vpc-ca-to-shared-vpc-london" {
+  destination_cidr_block         = "10.40.0.0/16"
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.peering-to-london-region.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rt-shared.id
+}
+
+resource "aws_ec2_transit_gateway_route" "shared-vpc-to-shared-vpc-london" {
+  destination_cidr_block         = "10.40.0.0/16"
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.peering-to-london-region.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rt-full-mesh.id
+}
+
 
 resource "aws_ec2_transit_gateway_route" "vpc-c-blackhole" {
   destination_cidr_block         = "172.20.0.0/16"

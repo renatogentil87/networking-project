@@ -31,7 +31,7 @@ module "ec2-shared-vpc" {
   subnet_id    = aws_subnet.private_subnet.id
   vpc_id       = aws_vpc.shared_vpc.id
   vpc_name     = "shared-vpc"
-  allowed_cidr = ["10.10.10.0/24", "10.10.20.0/24","10.20.10.0/24","10.20.20.0/24","10.30.10.0/24","10.30.20.0/24"]
+  allowed_cidr = ["10.10.10.0/24", "10.10.20.0/24","10.20.10.0/24","10.20.20.0/24","10.30.10.0/24","10.30.20.0/24","172.22.0.0/16"]
   key_output_path = path.root
 }
 

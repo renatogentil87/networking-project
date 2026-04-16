@@ -66,20 +66,16 @@ resource "aws_route_table_association" "private_subnet_assoc" {
   route_table_id = aws_route_table.private_route.id
 }
 
-variable "spoke_cidrs" {
-
-  description = "List of destination CIDRs to route through TGW"
-  type = list(string)
-  default = [
+locals {
+  spoke_cidrs = [
     "10.10.20.0/24",
     "10.20.20.0/24",
     "10.30.20.0/24"
   ]
 }
-
 resource "aws_route" "shared-vpc-to-all" {
+  for_each = toset(local.spoke_cidrs)
   route_table_id = aws_route_table.private_route.id
-  for_each = toset(var.spoke_cidrs)
   destination_cidr_block = each.value
   transit_gateway_id = aws_ec2_transit_gateway.main.id
 }

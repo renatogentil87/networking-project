@@ -84,3 +84,10 @@ resource "aws_route" "shared-vpc-to-all" {
   destination_cidr_block = each.value
   transit_gateway_id     = aws_ec2_transit_gateway.main.id
 }
+
+resource "aws_route" "shared-vpc-to-shared-vpc" {
+  route_table_id         = aws_route_table.private_route.id
+  destination_cidr_block = "10.40.0.0/16"
+  transit_gateway_id     = aws_ec2_transit_gateway.main.id
+}
+

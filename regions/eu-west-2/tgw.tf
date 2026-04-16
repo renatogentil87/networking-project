@@ -46,7 +46,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "shared-vpc-attachment" {
     transit_gateway_id = aws_ec2_transit_gateway.main.id
     vpc_id = aws_vpc.shared_vpc.id
     tags = merge(local.tgw-tags, {
-    Name = "VPC-C Attachment"
+    Name = "Shared VPC Attachment"
   })
 }
 
@@ -130,4 +130,16 @@ resource "aws_ec2_transit_gateway_route" "vpc-c-blackhole-on-full-mesh-rt" {
   destination_cidr_block         = "10.30.0.0/16"
   blackhole                      = true
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rt-full-mesh.id
+}
+
+resource "aws_ec2_transit_gateway_route" "vpc-c-to-shared-vpc-on-full-mesh-rt" {
+  destination_cidr_block         = "172.22.0.0/16"
+  transit_gateway_attachment_id = "tgw-attach-01de207ef227a3377"
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rt-full-mesh.id
+}
+
+resource "aws_ec2_transit_gateway_route" "vpc-c-to-shared-vpc-on-shared-rt" {
+  destination_cidr_block         = "172.22.0.0/16"
+  transit_gateway_attachment_id = "tgw-attach-01de207ef227a3377"
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rt-shared.id
 }

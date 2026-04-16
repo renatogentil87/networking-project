@@ -1,13 +1,28 @@
 version: 0.2
+
 phases:
   install:
     commands:
-      - "wget https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
-      - "unzip terraform_${TF_VERSION}_linux_amd64.zip"
-      - "mv terraform /usr/local/bin/"
+      - echo "Installing Terraform"
+      - wget https://releases.hashicorp.com/terraform/1.7.0/terraform_1.7.0_linux_amd64.zip
+      - unzip terraform_1.7.0_linux_amd64.zip
+      - mv terraform /usr/local/bin/
+      - terraform --version
+
   pre_build:
     commands:
-      - "terraform init -backend-config=backend.tfvars"
+      - echo "Running Terraform init"
+      - terraform init
+
   build:
     commands:
-      - "terraform apply -auto-approve tfplan"
+      - echo "Running Terraform apply"
+      - terraform apply -auto-approve tfplan
+
+  post_build:
+    commands:
+      - echo "Apply completed successfully"
+
+artifacts:
+  files:
+    - '**/*'
