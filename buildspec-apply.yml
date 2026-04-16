@@ -11,18 +11,26 @@ phases:
 
   pre_build:
     commands:
-      - echo "Running Terraform init"
+      - echo "Initializing Terraform for both regions"
+      - cd regions/ca-central-1
       - terraform init
+      - cd ../..
+      - cd regions/eu-west-2
+      - terraform init
+      - cd ../..
 
   build:
     commands:
-      - echo "Running Terraform apply"
-      - terraform apply -auto-approve tfplan
+      - echo "=== Applying Canada Region ==="
+      - cd regions/ca-central-1
+      - terraform apply -auto-approve tfplan-ca
+      - cd ../..
+
+      - echo "=== Applying London Region ==="
+      - cd regions/eu-west-2
+      - terraform apply -auto-approve tfplan-eu
+      - cd ../..
 
   post_build:
     commands:
-      - echo "Apply completed successfully"
-
-artifacts:
-  files:
-    - '**/*'
+      - echo "Both regions applied successfully"

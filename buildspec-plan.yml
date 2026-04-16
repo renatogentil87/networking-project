@@ -11,25 +11,46 @@ phases:
 
   pre_build:
     commands:
-      - echo "Running Terraform init"
+      - echo "=== Planning Canada Region ==="
+      - cd regions/ca-central-1
       - terraform init
-      - echo "Running Terraform validate"
       - terraform validate
-      - echo "Running Terraform fmt check"
       - terraform fmt -check -recursive
+      - cd ../..
+
+      - echo "=== Planning London Region ==="
+      - cd regions/eu-west-2
+      - terraform init
+      - terraform validate
+      - terraform fmt -check -recursive
+      - cd ../..
 
   build:
     commands:
-      - echo "Running Terraform plan"
-      - terraform plan -out=tfplan
-      - terraform show -no-color tfplan > plan-output.txt
+      - echo "=== Running Terraform Plan for Canada ==="
+      - cd regions/ca-central-1
+      - terraform plan -out=tfplan-ca
+      - terraform show -no-color tfplan-ca > plan-output-ca.txt
+      - cd ../..
+
+      - echo "=== Running Terraform Plan for London ==="
+      - cd regions/eu-west-2
+      - terraform plan -out=tfplan-eu
+      - terraform show -no-color tfplan-eu > plan-output-eu.txt
+      - cd ../..
 
   post_build:
     commands:
-      - echo "Plan completed successfully"
+      - echo "Both region plans completed successfully"
+      - echo "=== Canada Plan Summary ==="
+      - cat regions/ca-central-1/plan-output-ca.txt
+      - echo "=== London Plan Summary ==="
+      - cat regions/eu-west-2/plan-output-eu.txt
 
 artifacts:
   files:
-    - tfplan
-    - plan-output.txt
+    - regions/ca-central-1/tfplan-ca
+    - regions/ca-central-1/plan-output-ca.txt
+    - regions/eu-west-2/tfplan-eu
+    - regions/eu-west-2/plan-output-eu.txt
     - '**/*'
