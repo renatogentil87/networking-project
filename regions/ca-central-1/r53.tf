@@ -260,8 +260,8 @@ provider "aws" {
   region = "us-east-1"
 }
 resource "aws_route53_resolver_query_log_config" "query_logging" {
-  provider = aws.us-east-1 
-  name = "query-logging-to-cloudwatch"
+  provider = aws.us-east-1
+  name     = "query-logging-to-cloudwatch"
 
   destination_arn = aws_cloudwatch_log_group.r53_resolver_query_logs.arn
   depends_on      = [aws_cloudwatch_log_resource_policy.route53_query_logging_policy]
@@ -281,7 +281,7 @@ resource "aws_cloudwatch_log_group" "r53_resolver_query_logs" {
 }
 
 resource "aws_cloudwatch_log_resource_policy" "route53_query_logging_policy" {
-  provider    = aws.us-east-1 
+  provider    = aws.us-east-1
   policy_name = "route53-query-logging-policy"
 
   policy_document = jsonencode({

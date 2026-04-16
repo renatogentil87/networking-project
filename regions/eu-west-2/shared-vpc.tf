@@ -74,8 +74,8 @@ locals {
   ]
 }
 resource "aws_route" "shared-vpc-to-all" {
-  for_each = toset(local.spoke_cidrs)
-  route_table_id = aws_route_table.private_route.id
+  for_each               = toset(local.spoke_cidrs)
+  route_table_id         = aws_route_table.private_route.id
   destination_cidr_block = each.value
-  transit_gateway_id = aws_ec2_transit_gateway.main.id
+  transit_gateway_id     = aws_ec2_transit_gateway.main.id
 }

@@ -1,25 +1,25 @@
-variable subnet_id {
-    description = "Subnet Id"
-    type = string
-    default = ""
+variable "subnet_id" {
+  description = "Subnet Id"
+  type        = string
+  default     = ""
 }
 
 variable "vpc_id" {
-    description = "VPC Id"
-    type = string
-    default = ""
-  
+  description = "VPC Id"
+  type        = string
+  default     = ""
+
 }
 
 variable "vpc_name" {
-    description = "VPC Name"
-    type = string
-    default = ""
+  description = "VPC Name"
+  type        = string
+  default     = ""
 }
 
 variable "allowed_cidr" {
-    description = "Allowed CIDR Blocks"
-    type = list(string)
+  description = "Allowed CIDR Blocks"
+  type        = list(string)
 }
 
 variable "key_output_path" {

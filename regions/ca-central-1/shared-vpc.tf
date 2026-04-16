@@ -60,7 +60,7 @@ resource "aws_route_table" "private_route" {
 resource "aws_route" "default-to-nat" {
   route_table_id         = aws_route_table.private_route.id
   destination_cidr_block = "0.0.0.0/0"
-  transit_gateway_id = aws_ec2_transit_gateway.main.id
+  transit_gateway_id     = aws_ec2_transit_gateway.main.id
 }
 resource "aws_route_table_association" "private_subnet_assoc" {
   subnet_id      = aws_subnet.private_subnet.id
