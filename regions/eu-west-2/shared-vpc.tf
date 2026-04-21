@@ -55,6 +55,14 @@ resource "aws_route_table" "private_route" {
   })
 }
 
+resource "aws_route_table" "public_route" {
+  vpc_id = aws_vpc.shared_vpc.id
+  tags = merge(local.shared-vpc-tags, {
+    Name = "shared-vpc-public-rt"
+  })
+  
+}
+
 # Default route to NAT Gateway — now as a separate resource
 resource "aws_route" "default-to-nat" {
   route_table_id         = aws_route_table.private_route.id
@@ -65,6 +73,17 @@ resource "aws_route_table_association" "private_subnet_assoc" {
   subnet_id      = aws_subnet.private_subnet.id
   route_table_id = aws_route_table.private_route.id
 }
+
+resource "aws_route_table_association" "public_subnet_assoc" {
+  subnet_id      = aws_subnet.public_subnet.id
+  route_table_id = aws_route_table.public_route.id
+}
+resource "aws_route" "nat-to-igw" {
+  route_table_id         = aws_route_table.public_route.id
+  gateway_id             = aws_internet_gateway.igw.id
+  destination_cidr_block = "0.0.0.0/0"
+}
+  
 
 locals {
   spoke_cidrs = [
